@@ -88,7 +88,7 @@
   .main-nav a:focus-visible{outline:2px solid var(--tan);outline-offset:-3px;}
   .main-nav li.is-active a{background:var(--tan-block);color:var(--dark);}
 
-  /* ---- 購入リンク（ダミー／実在の販売ページには遷移しません） ---- */
+  /* ---- 購入リンク（ダミーボタン） ---- */
   .store-links{
     display:flex;
     flex-direction:column;
@@ -367,7 +367,7 @@
   .text-page{max-width:880px;margin:0 auto;padding:clamp(40px,6vw,64px) clamp(16px,4vw,32px) clamp(56px,8vw,96px);}
   .text-page p{font-family:var(--mincho);font-size:1rem;line-height:1.9;color:#3f342a;margin:0 0 16px;}
 
-  /*  SYSTEM：映像＋テキスト切替ショーケース  */
+  /*  SYSTEM：画像＋テキスト切替ショーケース  */
   .system-page{max-width:1100px;margin:0 auto;padding:clamp(36px,6vw,64px) clamp(16px,4vw,32px) clamp(56px,8vw,96px);}
 
   .system-showcase{
@@ -506,10 +506,10 @@
       </ul>
     </nav>
 
-    <!-- 購入リンク（まだ実在しないので、どこにも遷移しないダミーボタン） -->
+    <!-- 購入リンク（ダミーボタン） -->
     <div class="store-links">
-      <button type="button" class="store-btn" onclick="return false;">Steamで購入!!</button>
-      <button type="button" class="store-btn" onclick="return false;">Switchで購入!!</button>
+      <button type="button" class="store-btn" onclick="return false;">Steameで購入</button>
+      <button type="button" class="store-btn" onclick="return false;">Switchiで購入</button>
     </div>
   </aside>
 
@@ -524,9 +524,9 @@
         <div class="hero">
           <div class="hero__wordmark"><span>North</span><span>CARTE</span></div>
           <div class="hero__art">
-            <!-- ▼ 帆船イラストを images/hero-ship.png 等に用意して差し替えてください -->
+            <!--  images/hero-ship.png-->
             <img src="images/hero-ship.png" alt="帆船イラスト"
-                 onerror="this.outerHTML='<span class=&quot;hero__art__ph&quot;>ここに帆船イラストを配置</span>'">
+                 onerror="this.outerHTML='<span class=&quot;hero__art__ph&quot;>帆船イラストを配置</span>'">
           </div>
         </div>
 
@@ -613,7 +613,7 @@
 </div><!-- /.layout -->
 
 <script>
-  /* ---------------- News（TOPページ用。追加する場合は同じ形で増やしてください） ---------------- */
+  /* ---------------- News---------------- */
   const NEWS = [
     { date:"2026.3.5", text:"キャラクター公開" },
     { date:"2026.7.5", text:"続編「山頂」公開予定" }
@@ -629,7 +629,7 @@
     });
   }
 
-  /* ---------------- キャラクター（8名分。名前・役割・プロフィールを差し替えてください） ---------------- */
+  /* ---------------- キャラクター ---------------- */
   const CHARACTERS = [
     { id:1, name:"キャラクター01", job:"船長", quote:"あ、たばこきれた", profile:"軍人だが今回は船長として北極探検戦に乗船。愛煙家で常にタバコを持っている　軍人として普段は凶悪事件などの対応に追われている", ability:"鑑識（現場鑑識）", img:"" },
     { id:2, name:"キャラクター02", job:"賢者", quote:"未知を知らないなんてもったいない", profile:"軽薄な雰囲気をまとわせた賢者　賢者という称号を仮で与えられている禁忌魔術や黒魔術などの分野に特化した異端賢者", ability:"アーティファクト鑑定", img:"" },
@@ -689,9 +689,7 @@
       '</div>';
   }
 
-  /* ---------------- SYSTEM：映像＋テキスト切替ショーケース ----------------
-     video に動画パス(例: "videos/system-01.mp4")を入れると動画が再生されます。
-     空のままなら、下の placeholder テキストが表示されます。 */
+  /* ---------------- SYSTEM：画像＋テキスト切替ショーケース ---------------- */
   const SYSTEM_SLIDES = [
     {
       title:"CHARACTER",
