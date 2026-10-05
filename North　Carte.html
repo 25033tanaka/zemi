@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>North CARTE ノースカルテ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,600;6..96,800&family=Playfair+Display:wght@700;800&family=Noto+Sans+JP:wght@300;400&family=Shippori+Mincho:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --dark:#201615;
+    --tan:#9b8869;
+    --tan-block:#a8946f;
+    --tan-soft:#ddd3bb;
+    --cream:#fdfaee;
+    --card:#f4eed9;
+    --nav-font:'Bodoni Moda','Didot','Times New Roman',serif;
+    --wordmark-font:'Playfair Display',serif;
+    --sans:'Noto Sans JP',sans-serif;
+    --mincho:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  a{text-decoration:none;color:inherit;}
+  [hidden]{display:none !important;}
+
+  /* 全体レイアウト（左：縦ナビ／右：コンテンツ）  */
+  .layout{
+    display:flex;
+    min-height:100vh;
+    align-items:stretch;
+  }
+  .content{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+  }
+  main{flex:1;}
+
+  /*  SIDEBAR（縦並びナビ） */
+  .sidebar{
+    flex:0 0 auto;
+    width:clamp(180px,16vw,236px);
+    background:var(--dark);
+    display:flex;
+    flex-direction:column;
+    position:sticky;
+    top:0;
+    align-self:flex-start;
+    height:100vh;
+  }
+  .site-title{
+    display:flex;
+    align-items:center;
+    padding:22px 20px;
+    border-bottom:1px solid var(--tan);
+  }
+  .site-title img{height:52px;width:auto;display:block;}
+  .site-title__fallback{
+    font-family:var(--nav-font);
+    font-weight:800;
+    line-height:.95;
+    color:var(--tan);
+    font-size:1.3rem;
+    letter-spacing:.02em;
+  }
+  .main-nav ul{margin:0;padding:0;list-style:none;}
+  .main-nav li{border-bottom:1px solid rgba(155,136,105,.45);}
+  .main-nav a{
+    display:block;
+    padding:20px 22px;
+    font-family:var(--nav-font);
+    font-weight:800;
+    font-size:1.08rem;
+    letter-spacing:.04em;
+    color:var(--tan);
+    transition:background .2s ease,color .2s ease;
+  }
+  .main-nav a:hover{color:#c4b08c;}
+  .main-nav a:focus-visible{outline:2px solid var(--tan);outline-offset:-3px;}
+  .main-nav li.is-active a{background:var(--tan-block);color:var(--dark);}
+
+  /* ---- 購入リンク（ダミー／実在の販売ページには遷移しません） ---- */
+  .store-links{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:18px 20px 24px;
+    border-top:1px solid rgba(155,136,105,.45);
+  }
+  .store-btn{
+    display:flex;align-items:center;justify-content:center;
+    padding:11px 14px;
+    border:1px solid var(--tan);
+    background:none;
+    font-family:var(--nav-font);
+    font-weight:700;
+    font-size:.86rem;
+    letter-spacing:.05em;
+    color:var(--tan);
+    cursor:pointer;
+    transition:background .2s ease,color .2s ease;
+  }
+  .store-btn:hover{background:var(--tan);color:var(--dark);}
+  .store-btn:focus-visible{outline:2px solid var(--tan);outline-offset:2px;}
+
+  @media (max-width:760px){
+    .layout{flex-direction:column;}
+    .sidebar{
+      width:100%;height:auto;position:relative;top:auto;
+      flex-direction:row;align-items:center;
+    }
+    .site-title{border-bottom:none;border-right:1px solid var(--tan);padding:14px 16px;flex:0 0 auto;}
+    .site-title img{height:40px;}
+    .main-nav{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;}
+    .main-nav ul{display:flex;}
+    .main-nav li{border-bottom:none;border-right:1px solid rgba(155,136,105,.45);flex:0 0 auto;}
+    .main-nav a{padding:14px 18px;font-size:.92rem;white-space:nowrap;}
+    .store-links{
+      flex-direction:row;border-top:none;border-left:1px solid rgba(155,136,105,.45);
+      padding:10px 14px;flex:0 0 auto;
+    }
+    .store-btn{padding:9px 14px;font-size:.78rem;white-space:nowrap;}
+  }
+
+  /* 共通：見出し（斜め帯つき）  */
+  .section-title{
+    position:relative;isolation:isolate;
+    display:inline-block;
+    margin:0 0 clamp(28px,5vw,44px);
+    padding:0 16px 0 6px;
+    font-family:var(--nav-font);
+    font-weight:800;
+    font-size:clamp(2.6rem,7vw,3.8rem);
+    line-height:1.05;
+    color:var(--tan);
+  }
+  .section-title::before{
+    content:'';position:absolute;z-index:-1;
+    left:-26px;bottom:-8px;width:72%;height:58%;
+    background:var(--tan-soft);border-radius:50%;
+    transform:rotate(-13deg);
+  }
+
+  /* TOP：HERO  */
+  .top-page{max-width:1100px;margin:0 auto;padding:clamp(24px,4vw,40px) clamp(16px,4vw,32px) 0;}
+
+  .hero{
+    position:relative;
+    border:1px solid rgba(60,45,25,.55);
+    background:var(--cream);
+    min-height:min(78vw,560px);
+    display:grid;
+    grid-template-columns:1.05fr 1fr;
+    align-items:center;
+    gap:0;
+    overflow:hidden;
+  }
+  .hero__wordmark{
+    position:relative;z-index:2;
+    padding:clamp(24px,5vw,48px) 0 clamp(24px,5vw,48px) clamp(20px,5vw,52px);
+    font-family:var(--wordmark-font);
+    font-weight:800;
+    color:var(--tan);
+    line-height:.92;
+    font-size:clamp(2.6rem,8.5vw,5.4rem);
+    letter-spacing:.01em;
+  }
+  .hero__wordmark span{display:block;}
+
+  /* 帆船イラスト：後で images/hero-ship.jpg 等に差し替え */
+  .hero__art{
+    position:relative;
+    height:100%;
+    min-height:min(78vw,560px);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .hero__art img{
+    width:100%;height:100%;object-fit:contain;display:block;
+  }
+  .hero__art__ph{
+    font-family:var(--nav-font);
+    font-size:.8rem;
+    letter-spacing:.1em;
+    color:rgba(60,45,25,.4);
+    border:1px dashed rgba(60,45,25,.3);
+    padding:10px 16px;
+    text-align:center;
+  }
+
+  @media (max-width:760px){
+    .hero{grid-template-columns:1fr;grid-template-rows:auto auto;min-height:auto;}
+    .hero__wordmark{padding:28px 0 6px 24px;text-align:left;}
+    .hero__art{min-height:280px;padding-bottom:24px;}
+  }
+
+  /* 区切り線（ダイヤ） */
+  .divider{
+    text-align:center;
+    color:var(--tan);
+    font-size:clamp(1rem,2.4vw,1.3rem);
+    letter-spacing:.55em;
+    padding:clamp(20px,4vw,32px) 0;
+    user-select:none;
+  }
+
+  /*  TOP：NEWS（カード形式）  */
+  .news-section{padding-bottom:clamp(56px,8vw,96px);}
+  .news-grid{
+    list-style:none;margin:0;padding:0;
+    display:grid;
+    gap:clamp(12px,2vw,18px);
+  }
+  .news-card{
+    display:flex;
+    align-items:baseline;
+    gap:clamp(14px,3vw,26px);
+    padding:clamp(16px,2.6vw,22px) clamp(18px,3vw,26px);
+    background:var(--card);
+    border:1px solid rgba(155,136,105,.55);
+    transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+  }
+  .news-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 18px rgba(60,45,25,.16);
+    border-color:var(--tan);
+  }
+  .news-card time{
+    flex:0 0 auto;
+    font-family:var(--nav-font);
+    font-weight:700;
+    font-size:clamp(.95rem,1.6vw,1.1rem);
+    color:#6f5f45;
+    min-width:104px;
+  }
+  .news-card span{
+    font-family:var(--mincho);
+    font-size:clamp(1rem,1.8vw,1.1rem);
+    color:var(--dark);
+  }
+  .news-empty{
+    font-family:var(--mincho);
+    color:#8a7f68;
+    font-size:.95rem;
+    padding:18px 4px;
+  }
+
+  /*  CHARACTER PAGE  */
+  .char-page{
+    max-width:1000px;margin:0 auto;
+    padding:clamp(36px,6vw,64px) clamp(16px,4vw,32px) clamp(56px,8vw,96px);
+  }
+  .char-grid{
+    list-style:none;margin:0;padding:0;
+    display:grid;grid-template-columns:repeat(4,1fr);
+    gap:clamp(14px,2.4vw,26px);
+  }
+  @media (max-width:760px){.char-grid{grid-template-columns:repeat(2,1fr);}}
+  .char-card{
+    display:block;height:100%;
+    padding:10px 10px 16px;text-align:center;
+    background:var(--card);
+    border:1px solid rgba(155,136,105,.55);
+    transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+  }
+  .char-card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(60,45,25,.16);border-color:var(--tan);}
+  .char-card:focus-visible{outline:2px solid var(--tan);outline-offset:3px;}
+  .portrait{
+    aspect-ratio:3/4;margin-bottom:12px;
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+    background:linear-gradient(160deg,#cbbd9b,#9b8869);
+  }
+  .portrait img{width:100%;height:100%;object-fit:cover;display:block;}
+  .portrait__ph{font-family:var(--nav-font);font-weight:600;font-size:.8rem;letter-spacing:.14em;color:rgba(253,250,238,.85);}
+  .char-card__name{display:block;font-family:var(--mincho);font-weight:700;font-size:1rem;color:var(--dark);}
+  .char-card__role{display:block;margin-top:3px;font-family:var(--mincho);font-size:.82rem;color:#6f5f45;}
+
+  .back-link{
+    display:inline-block;margin-bottom:28px;padding-bottom:2px;
+    font-family:var(--mincho);font-size:.9rem;color:#6f5f45;
+    border-bottom:1px solid var(--tan);
+  }
+  .back-link:hover{color:var(--dark);}
+  .back-link:focus-visible{outline:2px solid var(--tan);outline-offset:3px;}
+
+  .char-detail{
+    display:grid;
+    grid-template-columns:1.15fr 1fr;
+    gap:clamp(26px,4.5vw,52px);
+    align-items:center;
+    background:var(--card);
+    border:1px solid rgba(155,136,105,.55);
+    padding:clamp(22px,4vw,40px);
+  }
+  @media (max-width:760px){
+    .char-detail{grid-template-columns:1fr;}
+  }
+  .char-detail__portrait{
+    aspect-ratio:3/4;
+    overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(160deg,#cbbd9b,#9b8869);
+  }
+  .char-detail__portrait img{width:100%;height:100%;object-fit:cover;display:block;}
+  .char-detail__job{
+    margin:0 0 6px;
+    font-family:var(--nav-font);
+    font-weight:700;
+    font-size:.85rem;
+    letter-spacing:.16em;
+    color:#6f5f45;
+  }
+  .char-detail__name{margin:0 0 16px;font-family:var(--mincho);font-weight:700;font-size:clamp(2.3rem,5.6vw,3.3rem);color:var(--dark);}
+  .char-detail__quote{
+    margin:0 0 26px;
+    padding-left:16px;
+    border-left:3px solid var(--tan);
+    font-family:var(--mincho);
+    font-size:1rem;
+    line-height:1.7;
+    color:#6f5f45;
+  }
+  .char-detail__heading{
+    margin:0 0 10px;
+    padding-bottom:5px;
+    border-bottom:1px solid var(--tan);
+    font-family:var(--nav-font);
+    font-weight:700;
+    font-size:.82rem;
+    letter-spacing:.14em;
+    color:#6f5f45;
+  }
+  .char-detail__profile{
+    margin:0 0 26px;
+    font-family:var(--mincho);
+    line-height:1.9;
+    color:#3f342a;
+    white-space:pre-line;
+  }
+  .char-detail__stats{display:grid;gap:12px;}
+  .char-detail__stat{display:flex;gap:14px;align-items:baseline;}
+  .char-detail__stat .label{
+    flex:0 0 auto;min-width:64px;
+    font-family:var(--nav-font);
+    font-weight:700;
+    font-size:.78rem;
+    letter-spacing:.1em;
+    color:#6f5f45;
+  }
+  .char-detail__stat .value{font-family:var(--mincho);color:var(--dark);}
+  .placeholder-note{
+    display:inline-block;padding:8px 14px;
+    font-family:var(--mincho);font-size:.85rem;color:#6f5f45;
+    background:#efe6cc;border:1px dashed var(--tan);
+  }
+
+  /* STORY（簡易ページ）  */
+  .text-page{max-width:880px;margin:0 auto;padding:clamp(40px,6vw,64px) clamp(16px,4vw,32px) clamp(56px,8vw,96px);}
+  .text-page p{font-family:var(--mincho);font-size:1rem;line-height:1.9;color:#3f342a;margin:0 0 16px;}
+
+  /*  SYSTEM：映像＋テキスト切替ショーケース  */
+  .system-page{max-width:1100px;margin:0 auto;padding:clamp(36px,6vw,64px) clamp(16px,4vw,32px) clamp(56px,8vw,96px);}
+
+  .system-showcase{
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+    gap:clamp(20px,4vw,40px);
+    align-items:stretch;
+    background:var(--card);
+    border:1px solid rgba(155,136,105,.55);
+    padding:clamp(18px,3.4vw,34px);
+  }
+  @media (max-width:760px){.system-showcase{grid-template-columns:1fr;}}
+
+  .system-showcase__media{
+    position:relative;
+    aspect-ratio:16/9;
+    overflow:hidden;
+    background:linear-gradient(160deg,#cbbd9b,#9b8869);
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid rgba(60,45,25,.4);
+  }
+  .system-showcase__media img{
+    width:100%;height:100%;object-fit:cover;display:block;
+  }
+  .system-showcase__media__ph{
+    font-family:var(--nav-font);
+    font-size:.78rem;
+    letter-spacing:.1em;
+    color:rgba(253,250,238,.85);
+    text-align:center;
+    padding:0 20px;
+  }
+
+  .system-showcase__panel{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .system-showcase__index{
+    font-family:var(--nav-font);
+    font-weight:700;
+    font-size:.82rem;
+    letter-spacing:.18em;
+    color:var(--tan);
+    margin:0 0 10px;
+  }
+  .system-showcase__title{
+    font-family:var(--mincho);
+    font-weight:700;
+    font-size:clamp(1.3rem,2.8vw,1.8rem);
+    color:var(--dark);
+    margin:0 0 14px;
+    line-height:1.4;
+  }
+  .system-showcase__desc{
+    font-family:var(--mincho);
+    font-size:.98rem;
+    line-height:1.9;
+    color:#3f342a;
+    margin:0;
+  }
+
+  /*  下部ナビゲーション（NEXTボタン＋ドット  */
+  .system-nav{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:clamp(16px,3vw,28px);
+    margin-top:clamp(20px,3.4vw,30px);
+  }
+  .system-nav__btn{
+    display:flex;align-items:center;gap:8px;
+    background:none;border:1px solid var(--tan);
+    padding:9px 18px;
+    cursor:pointer;
+    font-family:var(--nav-font);
+    font-weight:700;
+    font-size:.82rem;
+    letter-spacing:.14em;
+    color:#6f5f45;
+    transition:background .2s ease,color .2s ease;
+  }
+  .system-nav__btn:hover{background:var(--tan);color:var(--dark);}
+  .system-nav__btn:focus-visible{outline:2px solid var(--tan);outline-offset:2px;}
+  .system-nav__btn[disabled]{opacity:.35;cursor:default;background:none;color:#6f5f45;}
+  .system-nav__dots{display:flex;gap:9px;}
+  .system-nav__dot{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--tan-soft);
+    border:1px solid var(--tan);
+    padding:0;cursor:pointer;
+  }
+  .system-nav__dot.is-active{background:var(--tan);}
+  .system-nav__dot:focus-visible{outline:2px solid var(--tan);outline-offset:2px;}
+
+  .system-intro{
+    font-family:var(--mincho);
+    line-height:1.9;
+    color:#3f342a;
+    margin:0 0 clamp(26px,4vw,36px);
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .char-card,.news-card,.main-nav a{transition:none;}
+    .char-card:hover,.news-card:hover{transform:none;}
+  }
+
+  /* FOOTER  */
+  .site-footer{
+    background:var(--dark);height:130px;
+    display:flex;align-items:center;justify-content:center;padding:0 20px;
+  }
+  .site-footer p{
+    margin:0;font-family:var(--sans);font-weight:300;
+    font-size:clamp(.95rem,2vw,1.2rem);letter-spacing:.02em;color:var(--tan);text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!--  SIDEBAR（縦ナビ）  -->
+  <aside class="sidebar">
+    <a class="site-title" href="#top" aria-label="North CARTE トップへ">
+      <img src="images/title.jpg" alt="North CARTE"
+           onerror="this.outerHTML='<span class=&quot;site-title__fallback&quot;>North<br>CARTE</span>'">
+    </a>
+    <nav class="main-nav" aria-label="メインナビゲーション">
+      <ul id="nav-list">
+        <li data-nav="top"><a href="#top">TOP</a></li>
+        <li data-nav="concept"><a href="#concept">CONCEPT</a></li>
+        <li data-nav="story"><a href="#story">STORY</a></li>
+        <li data-nav="character"><a href="#character">CHARACTER</a></li>
+        <li data-nav="system"><a href="#system">SYSTEM</a></li>
+      </ul>
+    </nav>
+
+    <!-- 購入リンク（まだ実在しないので、どこにも遷移しないダミーボタン） -->
+    <div class="store-links">
+      <button type="button" class="store-btn" onclick="return false;">Steamで購入!!</button>
+      <button type="button" class="store-btn" onclick="return false;">Switchで購入!!</button>
+    </div>
+  </aside>
+
+  <div class="content">
+
+  <!-- ================= MAIN ================= -->
+  <main>
+
+    <!-- ============ TOP ============ -->
+    <section id="view-top" class="page-view" hidden>
+      <div class="top-page">
+        <div class="hero">
+          <div class="hero__wordmark"><span>North</span><span>CARTE</span></div>
+          <div class="hero__art">
+            <!-- ▼ 帆船イラストを images/hero-ship.png 等に用意して差し替えてください -->
+            <img src="images/hero-ship.png" alt="帆船イラスト"
+                 onerror="this.outerHTML='<span class=&quot;hero__art__ph&quot;>ここに帆船イラストを配置</span>'">
+          </div>
+        </div>
+
+        <div class="divider">&#9670; &#9670; &#9670; &#9670; &#9670; &#9670;</div>
+
+        <section class="news-section">
+          <h2 class="section-title">News</h2>
+          <ul class="news-grid" id="news-grid"></ul>
+        </section>
+      </div>
+    </section>
+
+    <!-- ============ CONCEPT ============ -->
+    <section id="view-concept" class="page-view" hidden>
+      <div class="text-page">
+        <h1 class="section-title">Concept</h1>
+        <p class="placeholder-note">
+        『North Carte』は、北極の呪われた航海路を舞台に探索と議論を繰り返しながら事件の真相と「傀儡」の正体を追う、マーダーミステリーの要素を取り入れたミステリーゲーム。
+
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ STORY ============ -->
+    <section id="view-story" class="page-view" hidden>
+      <div class="text-page">
+        <h1 class="section-title">Story</h1>
+        <p>これは終わらない死の航路——</p>
+        <p>北極圏に来た一隻の船が、氷に閉ざされた海で動きを止める。</p>
+        <p class="placeholder-note">北極に閉ざされた探検船。
+探検家たちに紛れ込んだ「傀儡」がいる。ある依頼を受け、それぞれの目的を胸に北極探検へと向かった八人の探検家。
+しかし、ある夜を境に彼らの記憶は途切れてしまう。意識を取り戻したあなたたちを待っていたのは、
+船内に残された一つの遺体だった。それは、この探検に参加した八人のうちの一人。
+――だが、そこには説明のつかない違和感があった。死んでいるはずの人物が、今もこの場にいる。
+誰かが嘘をついている。誰かが何かを隠している。
+探索で手がかりを集め、議論を重ね、
+この探検に潜む異常の正体を暴き出せ。
+あなたの隣にいるのは、探検家か。
+それとも――「傀儡」か。</p>
+      </div>
+    </section>
+
+    <!-- ============ CHARACTER：一覧 ============ -->
+    <section id="view-character" class="page-view" hidden>
+      <div class="char-page">
+        <h1 class="section-title">Character</h1>
+        <ul class="char-grid" id="char-grid"></ul>
+      </div>
+    </section>
+
+    <!-- ============ CHARACTER：詳細 ============ -->
+    <section id="view-character-detail" class="page-view" hidden>
+      <div class="char-page">
+        <a class="back-link" href="#character">&larr; CHARACTER 一覧へ戻る</a>
+        <div id="char-detail-body"></div>
+      </div>
+    </section>
+
+    <!-- ============ SYSTEM ============ -->
+    <section id="view-system" class="page-view" hidden>
+      <div class="system-page">
+        <h1 class="section-title">System</h1>
+
+        <div class="system-showcase">
+          <div class="system-showcase__media" id="system-media"></div>
+          <div class="system-showcase__panel">
+            <p class="system-showcase__index" id="system-index">01 / 03</p>
+            <h2 class="system-showcase__title" id="system-title"></h2>
+            <p class="system-showcase__desc" id="system-desc"></p>
+          </div>
+        </div>
+
+        <div class="system-nav">
+          <button type="button" class="system-nav__btn" id="system-prev" aria-label="前のシステム">&larr; PREV</button>
+          <div class="system-nav__dots" id="system-dots"></div>
+          <button type="button" class="system-nav__btn" id="system-next" aria-label="次のシステム">NEXT &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  </div><!-- /.content -->
+</div><!-- /.layout -->
+
+<script>
+  /* ---------------- News（TOPページ用。追加する場合は同じ形で増やしてください） ---------------- */
+  const NEWS = [
+    { date:"2026.3.5", text:"キャラクター公開" },
+    { date:"2026.7.5", text:"続編「山頂」公開予定" }
+  ];
+  const newsGrid = document.getElementById('news-grid');
+  if(NEWS.length === 0){
+    newsGrid.innerHTML = '<li class="news-empty">現在お知らせはありません</li>';
+  }else{
+    NEWS.forEach(function(n){
+      const li = document.createElement('li');
+      li.innerHTML = '<div class="news-card"><time>' + n.date + '</time><span>' + n.text + '</span></div>';
+      newsGrid.appendChild(li);
+    });
+  }
+
+  /* ---------------- キャラクター（8名分。名前・役割・プロフィールを差し替えてください） ---------------- */
+  const CHARACTERS = [
+    { id:1, name:"キャラクター01", job:"船長", quote:"あ、たばこきれた", profile:"軍人だが今回は船長として北極探検戦に乗船。愛煙家で常にタバコを持っている　軍人として普段は凶悪事件などの対応に追われている", ability:"鑑識（現場鑑識）", img:"" },
+    { id:2, name:"キャラクター02", job:"賢者", quote:"未知を知らないなんてもったいない", profile:"軽薄な雰囲気をまとわせた賢者　賢者という称号を仮で与えられている禁忌魔術や黒魔術などの分野に特化した異端賢者", ability:"アーティファクト鑑定", img:"" },
+    { id:3, name:"キャラクター03", job:"軍人", quote:"僕は違うと思うけど…", profile:"船長とは所属する軍が同じで腐れ縁　船長が乗船する際に荷物にタバコ15箱を持ち込んだので没収した", ability:"凶器鑑定", img:"" },
+    { id:4, name:"キャラクター04", job:"医者", quote:"ミリカは信じたいです…", profile:"医者見習い　血が苦手であり医者の師匠のひとことで北極探検戦に乗船　実戦経験をつむために乗船した　優しいが一度信じたら最期まで曲げる強い意志を持つ", ability:"鑑識（死因鑑定）", img:"" },
+    { id:5, name:"キャラクター05", job:"航海士", quote:"オレは問題児じゃないヨ", profile:"気づいたらどこかしらに勝手に探索している問題児　戻ってきたと思ったらなんかあったととんでもないものをもってきたりなどして船長の頭を抱えさせる　かなり特徴的な話し方をする", ability:"航海路", img:"" },
+    { id:6, name:"キャラクター06", job:"情報屋", quote:"僕は悪くないもん♪", profile:"", ability:"プロファイリング", img:"" },
+    { id:7, name:"キャラクター07", job:"機械技師", quote:"それで許されると思うな", profile:"感情論や印象論で議論をする姿勢があまり好きではない　こちらも船長と同じで愛煙家　ミリカとはよく衝突してしまう", ability:"機械修理", img:"" },
+    { id:8, name:"キャラクター08", job:"考古学者", quote:"", profile:"一人称が俺の女性考古学者　頭もよく身体能力もかなり高い　面倒見がミリカから姉のように慕われている", ability:"考古学", img:"" }
+  ];
+
+  const charGrid   = document.getElementById('char-grid');
+  const detailBody = document.getElementById('char-detail-body');
+
+  function portraitHTML(c){
+    return c.img
+      ? '<div class="portrait"><img src="' + c.img + '" alt="' + c.name + '"></div>'
+      : '<div class="portrait"><span class="portrait__ph">PORTRAIT</span></div>';
+  }
+
+  function detailPortraitHTML(c){
+    return c.img
+      ? '<div class="char-detail__portrait"><img src="' + c.img + '" alt="' + c.name + '"></div>'
+      : '<div class="char-detail__portrait"><span class="portrait__ph">PORTRAIT</span></div>';
+  }
+
+  CHARACTERS.forEach(function(c){
+    const li = document.createElement('li');
+    li.innerHTML =
+      '<a class="char-card" href="#character-' + c.id + '">' +
+        portraitHTML(c) +
+        '<span class="char-card__name">' + c.name + '</span>' +
+        '<span class="char-card__role">' + c.job + '</span>' +
+      '</a>';
+    charGrid.appendChild(li);
+  });
+
+  function renderDetail(c){
+    detailBody.innerHTML =
+      '<div class="char-detail">' +
+        '<div class="char-detail__body">' +
+          '<p class="char-detail__job">' + (c.job || '???') + '</p>' +
+          '<h1 class="char-detail__name">' + c.name + '</h1>' +
+          (c.quote
+            ? '<p class="char-detail__quote">「' + c.quote + '」</p>'
+            : '') +
+          '<h2 class="char-detail__heading">プロフィール</h2>' +
+          (c.profile
+            ? '<p class="char-detail__profile">' + c.profile + '</p>'
+            : '<p class="placeholder-note">プロフィールはここに追記してください</p>') +
+          '<h2 class="char-detail__heading">能力</h2>' +
+          '<p class="char-detail__profile">' +
+            (c.ability || '') +
+          '</p>' +
+        '</div>' +
+        detailPortraitHTML(c) +
+      '</div>';
+  }
+
+  /* ---------------- SYSTEM：映像＋テキスト切替ショーケース ----------------
+     video に動画パス(例: "videos/system-01.mp4")を入れると動画が再生されます。
+     空のままなら、下の placeholder テキストが表示されます。 */
+  const SYSTEM_SLIDES = [
+    {
+      title:"CHARACTER",
+      desc:"プレイヤーは8名のキャラクターの中から、プレイする1人を自由に選択できる。選んだキャラクターの視点で物語が進んでいく。",
+      img:"", placeholder:"ここにキャラクター選択画面のイラストを配置"
+    },
+    {
+      title:"ROLE",
+      desc:"ゲーム開始時、カジノチップによって役職が決定する。役職は「クルー」「傀儡」「クルーリーダー」の3種類。同じキャラクターでも、与えられた役職によって目的や物語の展開が大きく変化する。",
+      img:"", placeholder:"ここに役割システムのイラストを配置"
+    },
+    {
+      title:"EXPLORE｜探索パート",
+      desc:"船内や船外を探索し、事件の手がかりやアイテムを探す。キャラクター固有の能力やアーティファクトを使用することで、通常では得られない情報を入手することもできる。",
+      img:"", placeholder:"ここに鑑定シーンのイラストを配置"
+    },
+    {
+      title:"DISCUSSION｜議論パート",
+      desc:"",
+      img:"", placeholder:"ここにキャラクター目標紹介のイラストを配置"
+    },
+    {
+      title:"ENDING｜エンディング",
+      desc:"8名のキャラクター×自身の陣営（クルーか、傀儡か）により変化するエンディング。",
+      img:"", placeholder:"ここにエンディング紹介のイラストを配置"
+    }
+  ];
+
+  let systemIndex = 0;
+  const systemMedia = document.getElementById('system-media');
+  const systemIndexEl = document.getElementById('system-index');
+  const systemTitleEl = document.getElementById('system-title');
+  const systemDescEl  = document.getElementById('system-desc');
+  const systemDotsEl  = document.getElementById('system-dots');
+  const systemPrevBtn = document.getElementById('system-prev');
+  const systemNextBtn = document.getElementById('system-next');
+
+  SYSTEM_SLIDES.forEach(function(_, i){
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'system-nav__dot';
+    dot.setAttribute('aria-label', (i + 1) + '番目のシステムを表示');
+    dot.addEventListener('click', function(){ renderSystemSlide(i); });
+    systemDotsEl.appendChild(dot);
+  });
+  const systemDots = Array.from(systemDotsEl.children);
+
+  function renderSystemSlide(i){
+    systemIndex = (i + SYSTEM_SLIDES.length) % SYSTEM_SLIDES.length;
+    const s = SYSTEM_SLIDES[systemIndex];
+
+    systemMedia.innerHTML = s.img
+      ? '<img src="' + s.img + '" alt="' + s.title + '">'
+      : '<span class="system-showcase__media__ph">' + s.placeholder + '</span>';
+
+    const num = String(systemIndex + 1).padStart(2,'0');
+    const total = String(SYSTEM_SLIDES.length).padStart(2,'0');
+    systemIndexEl.textContent = num + ' / ' + total;
+    systemTitleEl.textContent = s.title;
+    systemDescEl.textContent  = s.desc;
+
+    systemDots.forEach(function(d, idx){
+      d.classList.toggle('is-active', idx === systemIndex);
+    });
+  }
+
+  systemPrevBtn.addEventListener('click', function(){ renderSystemSlide(systemIndex - 1); });
+  systemNextBtn.addEventListener('click', function(){ renderSystemSlide(systemIndex + 1); });
+  renderSystemSlide(0);
+
+  /* ---------------- ルーティング（#top / #story / #character / #character-3 / #system） ---------------- */
+  const views = {
+    top:               document.getElementById('view-top'),
+    concept:           document.getElementById('view-concept'),
+    story:             document.getElementById('view-story'),
+    character:         document.getElementById('view-character'),
+    'character-detail':document.getElementById('view-character-detail'),
+    system:            document.getElementById('view-system')
+  };
+  const navItems = Array.from(document.querySelectorAll('#nav-list li'));
+
+  function route(){
+    let hash = (location.hash || '#top').slice(1);
+    let viewKey = hash;
+    let navKey  = hash;
+
+    if(hash.indexOf('character-') === 0){
+      const id = parseInt(hash.replace('character-',''), 10);
+      const c = CHARACTERS.find(function(x){ return x.id === id; });
+      if(c){
+        renderDetail(c);
+        viewKey = 'character-detail';
+        navKey  = 'character';
+      }else{
+        viewKey = 'character';
+        navKey  = 'character';
+      }
+    }
+
+    if(!views[viewKey]) viewKey = 'top';
+    if(!['top','concept','story','character','system'].includes(navKey)) navKey = 'top';
+
+    Object.keys(views).forEach(function(key){
+      views[key].hidden = (key !== viewKey);
+    });
+    navItems.forEach(function(li){
+      li.classList.toggle('is-active', li.dataset.nav === navKey);
+    });
+    window.scrollTo(0,0);
+  }
+
+  window.addEventListener('hashchange', route);
+  route();
+</script>
+
+</body>
+</html>
